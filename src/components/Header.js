@@ -47,7 +47,7 @@ class Header extends React.Component {
                 <ul className="navigation">
                     <li><a href="/" className={currentPage === '' ? 'active' : ''}>Главная</a></li>
                     <li><a href="/about" className={currentPage === 'about' ? 'active' : ''}>О нас</a></li>
-                    <li><a href="/learn" className={currentPage === 'learn' ? 'active' : ''}>Изучать</a></li>
+                    <li><a href="/src/pages/Learn" className={currentPage === 'learn' ? 'active' : ''}>Изучать</a></li>
                     <li><a href="/contact" className={currentPage === 'contact' ? 'active' : ''}>Контакты</a></li>
                 </ul>
             </header>

@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import axios from 'axios';
-import ThemeSelector from "./ThemeSelector.js";
+import { useSelector, useDispatch, connect } from 'react-redux';
+import { setLanguage, setTheme } from '../redux/actions';
+import ThemeSelector from "./ThemeSelector";
 import "./Learn.css";
 
+const LanguageThemeContext = createContext();
+
 const Learn = () => {
+    const dispatch = useDispatch();
+    const selectedLanguage = useSelector(state => state.selectedLanguage);
+    const selectedTheme = useSelector(state => state.selectedTheme);
     const [languages, setLanguages] = useState([]);
-    const [selectedLanguage, setSelectedLanguage] = useState('');
     const [themes, setThemes] = useState([]);
-    const [selectedTheme, setSelectedTheme] = useState('');
     const [flashcards, setFlashcards] = useState([]);
     const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
@@ -30,9 +35,10 @@ const Learn = () => {
         fetchLanguages();
     }, []);
 
+
     const handleLanguageSelect = async (selectedLanguage) => {
-        setSelectedLanguage(selectedLanguage);
-        setSelectedTheme('');
+        dispatch(setLanguage(selectedLanguage));
+
 
         try {
             const response = await axios.get(`http://localhost:3002/themes/${selectedLanguage}`);
@@ -43,7 +49,7 @@ const Learn = () => {
     };
 
     const handleThemeSelect = async (selectedTheme) => {
-        setSelectedTheme(selectedTheme);
+        dispatch(setTheme(selectedTheme)); // Используем экшен setTheme
         setCurrentFlashcardIndex(0);
         setCurrentQuizQuestionIndex(0);
         setIsFlipped(false);
@@ -141,6 +147,7 @@ const Learn = () => {
     };
 
     return (
+        <LanguageThemeContext.Provider value={{ selectedLanguage, selectedTheme, setLanguage, setTheme }}>
         <div className="section">
             <div className="language-selector">
                 <h3>Languages</h3>
@@ -220,7 +227,20 @@ const Learn = () => {
                 </div>
             )}
         </div>
+        </LanguageThemeContext.Provider>
     );
 };
 
-export default Learn;
+const mapStateToProps = state => ({
+    selectedLanguage: state.selectedLanguage,
+    selectedTheme: state.selectedTheme
+});
+
+const mapDispatchToProps = {
+    setLanguage,
+    setTheme
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Learn);
+
+export const useLanguageTheme = () => useContext(LanguageThemeContext);
